@@ -82,7 +82,7 @@ public class CircuitBreakerTest {
         CheckedFunction0<String> checkedSupplier = CircuitBreaker.decorateCheckedSupplier(circuitBreaker, () -> {throw new RuntimeException("Failure as shame"); });
 
         Try<String> result = Try.of(checkedSupplier).recover(throwable -> "Hello Recovery 1");
-        logger.info(result + "");
+        logger.info("{}", result);
         logger.info("{}/{}", circuitBreaker.getMetrics().getNumberOfSuccessfulCalls(), circuitBreaker.getMetrics().getNumberOfFailedCalls());
         Try<String> result3 = Try.of(checkedSupplier).recover(throwable -> "Hello Recovery 2");
 
