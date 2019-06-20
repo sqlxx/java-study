@@ -91,10 +91,4 @@ public class CircuitBreakerTest {
 
     }
 
-    public static void main(String[] args) {
-        CircuitBreakerTest cbt = new CircuitBreakerTest();
-        cbt.recoverFromException();
-
-    }
-
 }
