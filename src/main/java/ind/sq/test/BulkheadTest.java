@@ -44,10 +44,10 @@ public class BulkheadTest {
         logger.info( "{}/{}", anotherBulkhead.getMetrics().getAvailableConcurrentCalls(), anotherBulkhead.getMetrics().getMaxAllowedConcurrentCalls());
         logger.info("{}", result.isSuccess());
         
-        for (int i = 0; i < 100; i ++) {
-            var wt = new WorkThread(bulkhead, i + "");
-            wt.start();
-        }
+        // for (int i = 0; i < 100; i ++) {
+        //     var wt = new WorkThread(bulkhead, i + "");
+        //     wt.start();
+        // }
     }
 
     class WorkThread extends Thread {
