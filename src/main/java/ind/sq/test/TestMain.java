@@ -50,5 +50,13 @@ public class TestMain {
         timeLimiter.chainedWithCircuitBreaker();
 
         logger.info("--------TimeLimiter test finished--------");
+
+
+        // logger.info("**********Test Future**************");
+        // var futureTest = new CompletableFutureTest();
+        // futureTest.normalFuture();
+        // futureTest.completableFuture();
+        // futureTest.completableFuture2();
+        // futureTest.completableFutureWithException();
     }
 }

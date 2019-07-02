@@ -44,6 +44,7 @@ public class TimeLimiterTest {
 
     public void timedout() throws Exception {
         Supplier<CompletableFuture<Integer>> futureSupplier = () -> CompletableFuture.supplyAsync(() -> {
+            logger.debug("running future");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -61,6 +62,7 @@ public class TimeLimiterTest {
 
     public void chainedWithCircuitBreaker() {
         Supplier<CompletableFuture<Integer>> futureSupplier = () -> CompletableFuture.supplyAsync(() -> {
+            logger.debug("running future");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
