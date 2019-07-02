@@ -1,4 +1,4 @@
-package ind.sq.test;
+package ind.sq.study.resilience4j;
 
 import java.time.Duration;
 import java.util.function.Supplier;

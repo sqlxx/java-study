@@ -1,4 +1,4 @@
-package ind.sq.test;
+package ind.sq.study.jdk;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

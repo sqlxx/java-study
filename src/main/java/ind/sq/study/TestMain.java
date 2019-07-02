@@ -1,7 +1,9 @@
-package ind.sq.test;
+package ind.sq.study;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ind.sq.study.resilience4j.*;
 
 public class TestMain {
     private static Logger logger = LoggerFactory.getLogger(TestMain.class);
