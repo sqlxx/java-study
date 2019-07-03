@@ -1,9 +1,7 @@
-package ind.sq.study;
+package ind.sq.study.resilience4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ind.sq.study.resilience4j.*;
 
 public class TestMain {
     private static Logger logger = LoggerFactory.getLogger(TestMain.class);
@@ -54,11 +52,6 @@ public class TestMain {
         logger.info("--------TimeLimiter test finished--------");
 
 
-        // logger.info("**********Test Future**************");
-        // var futureTest = new CompletableFutureTest();
-        // futureTest.normalFuture();
-        // futureTest.completableFuture();
-        // futureTest.completableFuture2();
-        // futureTest.completableFutureWithException();
+
     }
 }
