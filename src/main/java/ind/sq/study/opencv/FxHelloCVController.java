@@ -3,10 +3,12 @@ package ind.sq.study.opencv;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 
 import java.util.concurrent.Executors;
@@ -19,12 +21,27 @@ public class FxHelloCVController {
 
     @FXML
     private ImageView currentFrame;
+    @FXML
+    private CheckBox haarClassifier;
+    @FXML
+    private CheckBox lbpClassifier;
 
     private ScheduledExecutorService timer;
-    private VideoCapture capture = new VideoCapture();
-    private boolean cameraActive = false;
+    private VideoCapture capture;
+    private boolean cameraActive;
     private static int cameraId = 0;
 
+    private CascadeClassifier faceCascade;
+    private int absoluteFaceSize;
+
+    protected void init() {
+        this.capture = new VideoCapture();
+        this.cameraActive = false;
+        this.faceCascade = new CascadeClassifier();
+        this.absoluteFaceSize = 0;
+
+        currentFrame.setFitHeight(600);
+    }
     @FXML
     protected void startCamera(ActionEvent event) {
         if (!cameraActive) {

@@ -15,16 +15,18 @@ public class FxHelloCV extends Application {
             var loader = new FXMLLoader(getClass().getClassLoader().getResource("FXHelloCV.fxml"));
 
             var rootElement = (BorderPane) loader.load();
+            rootElement.setStyle("-fx-background-color: whitesmoke;");
 
             var scene = new Scene(rootElement, 800, 600);
-
             scene.getStylesheets().add(getClass().getClassLoader().getResource("application.css").toExternalForm());
-            primaryStage.setTitle("OPENCV");
+
+            primaryStage.setTitle("Face Detection");
             primaryStage.setScene(scene);
             primaryStage.show();
 
 
             FxHelloCVController controller = loader.getController();
+            controller.init();
             primaryStage.setOnCloseRequest((event) -> {
                 controller.setClosed();
 
