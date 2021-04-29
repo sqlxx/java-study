@@ -40,7 +40,7 @@ public class FxHelloCVController {
         this.faceCascade = new CascadeClassifier();
         this.absoluteFaceSize = 0;
 
-        currentFrame.setFitHeight(600);
+        currentFrame.setFitHeight(500);
     }
     @FXML
     protected void startCamera(ActionEvent event) {
@@ -72,6 +72,16 @@ public class FxHelloCVController {
             this.stopAcquisition();
         }
     }
+    @FXML
+    public void haarSelected() {
+        System.out.println("haarSelected");
+    }
+
+    @FXML
+    public void lbpSelected() {
+        System.out.println("lbpSelected");
+    }
+
 
     private Mat grabFrame() {
         Mat frame = new Mat();

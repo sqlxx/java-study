@@ -22,14 +22,6 @@
             <Separator />
         </VBox>
     </top>
-    <center>
-        <VBox alignment="CENTER">
-            <padding>
-                <Insets right="10" left="10" />
-            </padding>
-            <ImageView fx:id="currentFrame" />
-        </VBox>
-    </center>
     <bottom>
         <HBox alignment="center">
             <padding>
@@ -38,4 +30,13 @@
             <Button fx:id="button" alignment="center" onAction="#startCamera" text="Start Camera" />
         </HBox>
     </bottom>
+    <center>
+        <VBox alignment="CENTER">
+            <padding>
+                <Insets right="10" left="10" />
+            </padding>
+            <ImageView fx:id="currentFrame" />
+        </VBox>
+    </center>
+
 </BorderPane>

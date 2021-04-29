@@ -27,6 +27,7 @@ public class FxHelloCV extends Application {
 
             FxHelloCVController controller = loader.getController();
             controller.init();
+            System.out.println("Controller init.");
             primaryStage.setOnCloseRequest((event) -> {
                 controller.setClosed();
 
