@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
@@ -44,7 +45,11 @@ public class FxHelloCVController {
     }
     @FXML
     protected void startCamera(ActionEvent event) {
+
         if (!cameraActive) {
+            this.haarClassifier.setDisable(true);
+            this.haarClassifier.setDisable(true);
+
             this.capture.open(cameraId);
 
             if (this.capture.isOpened()) {
@@ -69,6 +74,8 @@ public class FxHelloCVController {
         } else {
             this.cameraActive = false;
             this.button.setText("Start Camera");
+            this.haarClassifier.setDisable(false);
+            this.lbpClassifier.setDisable(false);
             this.stopAcquisition();
         }
     }
@@ -90,7 +97,7 @@ public class FxHelloCVController {
                 this.capture.read(frame);
 
                 if (!frame.empty()) {
-                    Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
+                    this.detectAndDisplay(frame);
                 }
             } catch (Exception ex) {
                 System.out.println("Exception during the image elaboration: " + ex);
@@ -98,6 +105,16 @@ public class FxHelloCVController {
         }
 
         return frame;
+    }
+
+    private void detectAndDisplay(Mat frame) {
+        MatOfRect faces = new MatOfRect();
+        Mat grayFrame = new Mat();
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.equalizeHist(frame, frame);
+
+
     }
 
     private void updateImageView(ImageView view, Image image) {
