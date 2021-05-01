@@ -17,7 +17,7 @@ public class FxHelloCV extends Application {
             var rootElement = (BorderPane) loader.load();
             rootElement.setStyle("-fx-background-color: whitesmoke;");
 
-            var scene = new Scene(rootElement, 800, 600);
+            var scene = new Scene(rootElement, 1280, 820);
             scene.getStylesheets().add(getClass().getClassLoader().getResource("application.css").toExternalForm());
 
             primaryStage.setTitle("Face Detection");

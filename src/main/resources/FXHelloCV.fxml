@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ind.sq.study.opencv.FxHelloCVController">
     <top>
         <VBox>
@@ -18,6 +20,13 @@
                 </padding>
                 <CheckBox fx:id="haarClassifier" onAction="#haarSelected" text="Haar Classifier"/>
                 <CheckBox fx:id="lbpClassifier" onAction="#lbpSelected" text="LBP Classifier"/>
+                <Separator orientation="VERTICAL"/>
+                <CheckBox fx:id="cannyEdgeDetector" onAction="#cannySelected" text="Edge detection"/>
+                <Label text="Canny Threshold" />
+                <Slider fx:id="edThreshold" disable="true" />
+                <Separator orientation="VERTICAL"/>
+                <CheckBox fx:id="dilateErode" onAction="#dilateErodeSelected" text="Background Removal"/>
+                <CheckBox fx:id="inverse" disable="true" text="Invert"/>
             </HBox>
             <Separator />
         </VBox>
