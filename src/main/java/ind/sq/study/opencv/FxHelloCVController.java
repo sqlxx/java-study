@@ -9,11 +9,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 import org.opencv.videoio.VideoCapture;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -41,6 +43,10 @@ public class FxHelloCVController {
     private CheckBox inverse;
     @FXML
     private CheckBox absRemoval;
+    @FXML
+    private Button refreshImgButton;
+
+    private boolean imgSelected;
 
     private ScheduledExecutorService timer;
     private VideoCapture capture;
@@ -54,15 +60,20 @@ public class FxHelloCVController {
     Point clickedPoint = new Point(0, 0);
 
     protected void init() {
+        this.refreshImgButton.setVisible(false);
         this.capture = new VideoCapture();
         this.cameraActive = false;
         this.faceCascade = new CascadeClassifier();
         this.absoluteFaceSize = 0;
         currentFrame.setFitWidth(1280);
+        currentFrame.setFitHeight(720);
         currentFrame.setPreserveRatio(true);
+        imgSelected = false;
     }
     @FXML
     protected void startCamera(ActionEvent event) {
+        imgSelected = false;
+        refreshImgButton.setVisible(false);
         currentFrame.setOnMouseClicked(e -> {
             clickedPoint.x = e.getX();
             clickedPoint.y = e.getY();
@@ -106,8 +117,41 @@ public class FxHelloCVController {
     public void chooseImg(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Image");
-        fileChooser.showOpenDialog(this.chooseImgButton.g);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.bmp"));
+        var file = fileChooser.showOpenDialog(this.chooseImgButton.getScene().getWindow());
+
+        if (file != null) {
+            imgSelected = true;
+
+            loadImg(file);
+        }
+
     }
+
+    private void loadImg(File file) {
+        System.out.println(file.getPath());
+        this.oldFrame = Imgcodecs.imread(file.getPath());
+        if (!oldFrame.empty()) {
+            resetAllController();
+            refreshImgButton.setVisible(true);
+
+            updateImageView(currentFrame, Utils.mat2Image(oldFrame));
+        }
+
+    }
+
+    private void resetAllController() {
+        this.stopAcquisition();
+        this.lbpClassifier.setSelected(false);
+        this.haarClassifier.setSelected(false);
+        this.cannyEdgeDetector.setSelected(false);
+        this.dilateErode.setSelected(false);
+        this.inverse.setSelected(false);
+        this.absRemoval.setSelected(false);
+        this.cameraActive = false;
+        this.startCameraButton.setText("Start Camera");
+    }
+
     @FXML
     public void haarSelected() {
         this.lbpClassifier.setSelected(false);
@@ -115,6 +159,10 @@ public class FxHelloCVController {
         this.edThreshold.setDisable(true);
 
         this.checkBoxSelection("target/classes/haarcascades/haarcascade_frontalface_alt.xml");
+
+        if (imgSelected) {
+            refreshImg();
+        }
     }
 
     private void checkBoxSelection(String loc) {
@@ -129,6 +177,17 @@ public class FxHelloCVController {
 
 
         this.checkBoxSelection("target/classes/lbpcascades/lbpcascade_frontalface_improved.xml");
+
+        if (imgSelected) {
+            refreshImg();
+        }
+    }
+
+    @FXML
+    public void applyToImg() {
+        if (imgSelected) {
+            refreshImg();
+        }
     }
 
     @FXML
@@ -137,6 +196,10 @@ public class FxHelloCVController {
         this.lbpClassifier.setSelected(false);
 
         this.edThreshold.setDisable(false);
+
+        if (imgSelected) {
+            refreshImg();
+        }
     }
 
     @FXML
@@ -146,6 +209,10 @@ public class FxHelloCVController {
         } else {
             inverse.setSelected(false);
             inverse.setDisable(true);
+        }
+
+        if (imgSelected) {
+            refreshImg();
         }
     }
 
@@ -157,25 +224,38 @@ public class FxHelloCVController {
                 this.capture.read(frame);
 
                 if (!frame.empty()) {
-                    if(this.haarClassifier.isSelected() || this.lbpClassifier.isSelected()) {
-                        this.detectAndDisplay(frame);
-                    }
-
-                    if (this.cannyEdgeDetector.isSelected()) {
-                        frame = this.doCanny(frame);
-                    } else if (this.dilateErode.isSelected()) {
-                        if (this.absRemoval.isSelected()) {
-                            frame = this.doBackgroundRemovalFloodFill(frame);
-                        } else {
-                            frame = this.doBackgroundRemoval(frame);
-                        }
-                    }
+                    frame = processFrame(frame);
                 }
             } catch (Exception ex) {
                 System.out.println("Exception during the image elaboration: " + ex);
             }
         }
 
+        return frame;
+    }
+
+    private void refreshImg() {
+        if (! oldFrame.empty()) {
+            var frame = processFrame(oldFrame);
+
+            updateImageView(currentFrame, Utils.mat2Image(frame));
+        }
+
+    }
+
+    private Mat processFrame(Mat oriFrame) {
+        var frame = oriFrame;
+        if(this.haarClassifier.isSelected() || this.lbpClassifier.isSelected()) {
+            frame = this.detectAndDisplay(oriFrame);
+        } else if (this.cannyEdgeDetector.isSelected()) {
+            frame = this.doCanny(oriFrame);
+        } else if (this.dilateErode.isSelected()) {
+            if (this.absRemoval.isSelected()) {
+                frame = this.doBackgroundRemovalFloodFill(oriFrame);
+            } else {
+                frame = this.doBackgroundRemoval(oriFrame);
+            }
+        }
         return frame;
     }
 
@@ -272,27 +352,32 @@ public class FxHelloCVController {
 
     }
 
-    private void detectAndDisplay(Mat frame) {
+    private Mat detectAndDisplay(Mat oriFrame) {
         MatOfRect faces = new MatOfRect();
-        Mat grayFrame = new Mat();
-        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+        Mat frame = new Mat();
+        Mat result = new Mat();
+        oriFrame.copyTo(result);
+        Imgproc.cvtColor(oriFrame, frame, Imgproc.COLOR_BGR2GRAY);
 
-        Imgproc.equalizeHist(grayFrame, grayFrame);
+        Imgproc.equalizeHist(frame, frame);
 
         if (this.absoluteFaceSize == 0) {
-            int height = grayFrame.rows();
+            int height = frame.rows();
             if (Math.round(height * 0.2f) > 0) {
                 this.absoluteFaceSize = Math.round(height * 0.2f);
             }
         }
 
-        this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+        this.faceCascade.detectMultiScale(frame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
                 new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 
         Rect[] facesArray = faces.toArray();
         for (int i = 0; i < facesArray.length; i ++) {
-            Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
+            System.out.println(facesArray[i].tl() + ", " + facesArray[i].br());
+            Imgproc.rectangle(result, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
         }
+
+        return result;
     }
 
     private void updateImageView(ImageView view, Image image) {

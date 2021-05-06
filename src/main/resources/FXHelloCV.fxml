@@ -28,6 +28,8 @@
                 <CheckBox fx:id="dilateErode" onAction="#dilateErodeSelected" text="Background Removal"/>
                 <CheckBox fx:id="inverse" disable="true" text="Invert"/>
                 <CheckBox fx:id="absRemoval" text="using abs removal"/>
+                <Separator orientation="VERTICAL"/>
+                <Button fx:id="refreshImgButton" onAction="#applyToImg" text="Refresh"/>
             </HBox>
             <Separator />
         </VBox>
