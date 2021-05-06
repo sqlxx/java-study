@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
@@ -21,8 +22,9 @@ import java.util.concurrent.TimeUnit;
 
 public class FxHelloCVController {
     @FXML
-    private Button button;
-
+    private Button startCameraButton;
+    @FXML
+    private Button chooseImgButton;
     @FXML
     private ImageView currentFrame;
     @FXML
@@ -37,6 +39,8 @@ public class FxHelloCVController {
     private CheckBox dilateErode;
     @FXML
     private CheckBox inverse;
+    @FXML
+    private CheckBox absRemoval;
 
     private ScheduledExecutorService timer;
     private VideoCapture capture;
@@ -45,6 +49,9 @@ public class FxHelloCVController {
 
     private CascadeClassifier faceCascade;
     private int absoluteFaceSize;
+    private Mat oldFrame;
+
+    Point clickedPoint = new Point(0, 0);
 
     protected void init() {
         this.capture = new VideoCapture();
@@ -56,6 +63,10 @@ public class FxHelloCVController {
     }
     @FXML
     protected void startCamera(ActionEvent event) {
+        currentFrame.setOnMouseClicked(e -> {
+            clickedPoint.x = e.getX();
+            clickedPoint.y = e.getY();
+        });
 
         if (!cameraActive) {
             this.haarClassifier.setDisable(true);
@@ -78,17 +89,24 @@ public class FxHelloCVController {
                 this.timer = Executors.newSingleThreadScheduledExecutor();
                 this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
 
-                this.button.setText("Stop Camera");
+                this.startCameraButton.setText("Stop Camera");
             } else {
                 System.out.println("Can't open the camera");
             }
         } else {
             this.cameraActive = false;
-            this.button.setText("Start Camera");
+            this.startCameraButton.setText("Start Camera");
             this.haarClassifier.setDisable(false);
             this.lbpClassifier.setDisable(false);
             this.stopAcquisition();
         }
+    }
+
+    @FXML
+    public void chooseImg(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Image");
+        fileChooser.showOpenDialog(this.chooseImgButton.g);
     }
     @FXML
     public void haarSelected() {
@@ -146,10 +164,12 @@ public class FxHelloCVController {
                     if (this.cannyEdgeDetector.isSelected()) {
                         frame = this.doCanny(frame);
                     } else if (this.dilateErode.isSelected()) {
-                        frame = this.doBackgroundRemoval(frame);
+                        if (this.absRemoval.isSelected()) {
+                            frame = this.doBackgroundRemovalFloodFill(frame);
+                        } else {
+                            frame = this.doBackgroundRemoval(frame);
+                        }
                     }
-
-
                 }
             } catch (Exception ex) {
                 System.out.println("Exception during the image elaboration: " + ex);
@@ -169,12 +189,13 @@ public class FxHelloCVController {
             thresh_type = Imgproc.THRESH_BINARY;
         }
 
-//        hsvImg.create(frame.size(), CvType.CV_8U);
+        // hsvImg.create(frame.size(), CvType.CV_8U);
         Imgproc.cvtColor(frame, hsvImg, Imgproc.COLOR_BGR2HSV);
         Core.split(hsvImg, hsvPlanes);
 
         double threshValue = this.getHistAverage(hsvImg, hsvPlanes.get(0));
         Imgproc.threshold(hsvPlanes.get(0), thresholdImg, threshValue, 179.0, thresh_type);
+
         Imgproc.blur(thresholdImg, thresholdImg, new Size(5, 5));
 
         Imgproc.dilate(thresholdImg, thresholdImg, new Mat(), new Point(-1, -1), 1);
@@ -183,12 +204,37 @@ public class FxHelloCVController {
         Mat foreground = new Mat(frame.size(), CvType.CV_8UC3, new Scalar(255, 255, 255));
         frame.copyTo(foreground, thresholdImg);
 
-        return frame;
+        return foreground;
     }
 
-    private double getHistAverage(Mat hsvImg, Mat mat) {
-        // TODO:
-        return 0;
+    private Mat doBackgroundRemovalFloodFill(Mat frame) {
+        Scalar newVal = new Scalar(255, 255, 255);
+        Scalar loDiff = new Scalar(50, 50, 50);
+        Scalar upDiff = new Scalar(50, 50, 50);
+
+        Point seedPoint = clickedPoint;
+        Mat mask = new Mat();
+        Rect rect = new Rect();
+
+        Imgproc.floodFill(frame, mask, seedPoint, newVal, rect, loDiff, upDiff, Imgproc.FLOODFILL_FIXED_RANGE);
+        return frame;
+
+    }
+
+    private double getHistAverage(Mat hsvImg, Mat hueValues) {
+        double average = 0.0;
+        Mat hist_hue = new Mat();
+        MatOfInt histSize = new MatOfInt(180);
+        var hue = new ArrayList<Mat>();
+        hue.add(hueValues);
+
+        Imgproc.calcHist(hue, new MatOfInt(0), new Mat(), hist_hue, histSize, new MatOfFloat(0, 179));
+
+        for (int h = 0; h < 180; h++) {
+            average += (hist_hue.get(h, 0)[0] * h);
+        }
+
+        return  average / hsvImg.size().height / hsvImg.size().width;
     }
 
     private Mat doCanny(Mat frame) {
@@ -203,7 +249,26 @@ public class FxHelloCVController {
         return result;
     }
 
-    private void doBackgroundRemovalAbsDiff(Mat frame) {
+    private Mat doBackgroundRemovalAbsDiff(Mat currentFrame) {
+        Mat greyImage = new Mat();
+        Mat foregroundImg = new Mat();
+
+        if (oldFrame == null) {
+            oldFrame = currentFrame;
+        }
+
+        Core.absdiff(currentFrame, oldFrame, foregroundImg);
+        Imgproc.cvtColor(foregroundImg, greyImage, Imgproc.COLOR_BGR2GRAY);
+
+        int thresh_type = Imgproc.THRESH_BINARY_INV;
+        if (this.inverse.isSelected()) {
+            thresh_type = Imgproc.THRESH_BINARY;
+        }
+        Imgproc.threshold(greyImage, greyImage, 10, 255, thresh_type);
+        currentFrame.copyTo(foregroundImg, greyImage);
+
+        oldFrame = currentFrame;
+        return foregroundImg;
 
     }
 

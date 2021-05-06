@@ -27,6 +27,7 @@
                 <Separator orientation="VERTICAL"/>
                 <CheckBox fx:id="dilateErode" onAction="#dilateErodeSelected" text="Background Removal"/>
                 <CheckBox fx:id="inverse" disable="true" text="Invert"/>
+                <CheckBox fx:id="absRemoval" text="using abs removal"/>
             </HBox>
             <Separator />
         </VBox>
@@ -36,7 +37,8 @@
             <padding>
                 <Insets bottom="25" left="25" right="25" top="25" />
             </padding>
-            <Button fx:id="button" alignment="center" onAction="#startCamera" text="Start Camera" />
+            <Button fx:id="startCameraButton" alignment="center" onAction="#startCamera" text="Start Camera" />
+            <Button fx:id="chooseImgButton" alignment="center" onAction="#chooseImg" text="Choose Image" />
         </HBox>
     </bottom>
     <center>
