@@ -29,6 +29,7 @@
                 <CheckBox fx:id="inverse" disable="true" text="Invert"/>
                 <CheckBox fx:id="absRemoval" text="using abs removal"/>
                 <Separator orientation="VERTICAL"/>
+                <CheckBox fx:id="qrCodeDetect" text="Detect QrCode" onAction="#qrCodeSelected"/>
                 <Button fx:id="refreshImgButton" onAction="#applyToImg" text="Refresh"/>
             </HBox>
             <Separator />

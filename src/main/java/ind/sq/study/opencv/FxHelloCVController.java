@@ -13,7 +13,9 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
+import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
+import org.opencv.wechat_qrcode.WeChatQRCode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +47,10 @@ public class FxHelloCVController {
     private CheckBox absRemoval;
     @FXML
     private Button refreshImgButton;
+    @FXML
+    private CheckBox qrCodeDetect;
 
+    private double ratio;
     private boolean imgSelected;
 
     private ScheduledExecutorService timer;
@@ -69,15 +74,23 @@ public class FxHelloCVController {
         currentFrame.setFitHeight(720);
         currentFrame.setPreserveRatio(true);
         imgSelected = false;
+
+        currentFrame.setOnMouseClicked(e -> {
+            System.out.println(currentFrame.getLayoutX());
+            System.out.println(currentFrame.getFitWidth());
+            clickedPoint.x = e.getX() * ratio;
+            clickedPoint.y = e.getY() * ratio;
+            System.out.println("x: " + e.getX() + " y: " + e.getY() + " sx: " + e.getSceneX() + " sy: " + e.getSceneY());
+            if (imgSelected) {
+                refreshImg();
+            }
+        });
     }
     @FXML
     protected void startCamera(ActionEvent event) {
         imgSelected = false;
         refreshImgButton.setVisible(false);
-        currentFrame.setOnMouseClicked(e -> {
-            clickedPoint.x = e.getX();
-            clickedPoint.y = e.getY();
-        });
+
 
         if (!cameraActive) {
             this.haarClassifier.setDisable(true);
@@ -124,6 +137,7 @@ public class FxHelloCVController {
             imgSelected = true;
 
             loadImg(file);
+            refreshImg();
         }
 
     }
@@ -133,6 +147,11 @@ public class FxHelloCVController {
         this.oldFrame = Imgcodecs.imread(file.getPath());
         if (!oldFrame.empty()) {
             resetAllController();
+            var height = oldFrame.rows();
+            var width = oldFrame.cols();
+
+            ratio = Math.max(height/720.0, width/1280.0);
+            System.out.println("The ratio is " + ratio);
             refreshImgButton.setVisible(true);
 
             updateImageView(currentFrame, Utils.mat2Image(oldFrame));
@@ -203,6 +222,14 @@ public class FxHelloCVController {
     }
 
     @FXML
+    public void qrCodeSelected() {
+
+        if (imgSelected) {
+            refreshImg();
+        }
+    }
+
+    @FXML
     public void dilateErodeSelected() {
         if (dilateErode.isSelected()) {
             inverse.setDisable(false);
@@ -215,7 +242,6 @@ public class FxHelloCVController {
             refreshImg();
         }
     }
-
 
     private Mat grabFrame() {
         Mat frame = new Mat();
@@ -255,8 +281,79 @@ public class FxHelloCVController {
             } else {
                 frame = this.doBackgroundRemoval(oriFrame);
             }
+        } else if (this.qrCodeDetect.isSelected()) {
+//            frame = this.detectQrCode(oriFrame);
+            frame = this.wechatQrDetector(oriFrame);
         }
         return frame;
+    }
+
+    private Mat detectQrCode(Mat oriFrame) {
+        var detector = new QRCodeDetector();
+        var result = new Mat();
+        var points = new Mat();
+
+        oriFrame.copyTo(result);
+        var resultList = new ArrayList<String>();
+        if (detector.detectAndDecodeMulti(result, resultList, points)) {
+//            System.out.println(points.rows() + ", " + points.cols() + ", " + points.channels());
+            System.out.println("Result size is: " + resultList.size());
+            for (var resultStr : resultList) {
+                System.out.println(resultStr);
+            }
+            int noOfRows = points.rows();
+            int noOfCols = points.cols();
+            for (int row = 0; row < noOfRows; row ++) {
+                for (int col = 0; col < noOfCols; col++) {
+//                    System.out.println("row: " + row + ", col: " +  col);
+                    System.out.println("p1x: " + points.get(row, col)[0] + "p1y: " +
+                            points.get(row, col)[1] + " p2x: " + points.get(row, (col + 1) % noOfCols)[0]
+                            + " p2y: " + points.get(row, (col + 1) % noOfCols)[1]);
+                    Imgproc.line(result, new Point(points.get(row, col)), new Point(points.get(row, (col + 1) % noOfCols)),
+                            new Scalar(255, 0, 0), 3);
+                }
+            }
+        } else {
+            System.out.println("No qr code detected.");
+        };
+
+        return result;
+
+    }
+
+    private Mat wechatQrDetector(Mat oriFrame) {
+
+        var detector = new WeChatQRCode("/Users/sqlxx/Downloads/detect.prototxt", "/Users/sqlxx/Downloads/detect.caffemodel",
+                "/Users/sqlxx/Downloads/sr.prototxt", "/Users/sqlxx/Downloads/sr.caffemodel");
+//        var detector = new WeChatQRCode("/Users/sqlxx/Downloads/detect.prototxt", "/Users/sqlxx/Downloads/detect.caffemodel");
+        var result = new Mat();
+        var pointsOfRect = new ArrayList<Mat>();
+
+        oriFrame.copyTo(result);
+        var results = detector.detectAndDecode(result, pointsOfRect);
+        if (results.size() > 0) {
+            System.out.println("Result size is: " + results.size());
+            for (var resultStr : results) {
+                System.out.println(resultStr);
+            }
+
+            System.out.println("Point of rect is: " + pointsOfRect.size());
+            for (var points : pointsOfRect ) {
+                System.out.println(points.rows() + ", " + points.cols() + ", " + points.channels());
+                int noOfRows = points.rows();
+                int noOfCols = points.cols();
+                for (int row = 0; row < noOfRows; row++) {
+                    System.out.println("p1x: " + points.get(row, 0)[0] + "p1y: " + points.get(row, 1)[0] + " p2x: " + points.get((row + 1) % noOfRows, 0)[0] + " p2y: " + points.get((row + 1) % noOfRows, 1)[0]);
+                    Imgproc.line(result, new Point(points.get(row, 0)[0], points.get(row, 1)[0]),
+                            new Point(points.get((row + 1) % noOfRows, 0)[0], points.get((row + 1) % noOfRows, 1)[0]),
+                            new Scalar(255, 0, 0), 3);
+                }
+            }
+        } else {
+            System.out.println("No qr code detected.");
+        };
+
+        return result;
     }
 
     private Mat doBackgroundRemoval(Mat frame) {
@@ -295,9 +392,12 @@ public class FxHelloCVController {
         Point seedPoint = clickedPoint;
         Mat mask = new Mat();
         Rect rect = new Rect();
-
-        Imgproc.floodFill(frame, mask, seedPoint, newVal, rect, loDiff, upDiff, Imgproc.FLOODFILL_FIXED_RANGE);
-        return frame;
+        var newFrame = new Mat();
+        frame.copyTo(newFrame);
+        Imgproc.floodFill(newFrame, mask, seedPoint, newVal, rect, loDiff, upDiff, Imgproc.FLOODFILL_FIXED_RANGE);
+        System.out.println("Click on " + seedPoint.x + ", " + seedPoint.y);
+        Imgproc.circle(newFrame, clickedPoint, 5, new Scalar(255, 0, 0), 1);
+        return newFrame;
 
     }
 
