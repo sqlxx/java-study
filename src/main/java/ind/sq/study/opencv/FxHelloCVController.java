@@ -310,6 +310,7 @@ public class FxHelloCVController {
         hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.UPC_A, BarcodeFormat.UPC_E,
                 BarcodeFormat.CODE_39, BarcodeFormat.CODE_93, BarcodeFormat.CODABAR, BarcodeFormat.CODE_128,
                 BarcodeFormat.EAN_8, BarcodeFormat.EAN_13, BarcodeFormat.ITF, BarcodeFormat.RSS_14, BarcodeFormat.RSS_EXPANDED));
+//        hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList( BarcodeFormat.EAN_8 ));
 //        hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
 
         var barCodeReader = new GenericMultipleBarcodeReader(new MultiFormatReader());
@@ -318,11 +319,11 @@ public class FxHelloCVController {
         var analyseMat = new Mat();
         try {
             Imgproc.cvtColor(oriFrame, analyseMat, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*8, analyseMat.height()*4), Imgproc.INTER_AREA);
+            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*8, analyseMat.height()), Imgproc.INTER_AREA);
             Imgproc.blur(analyseMat, analyseMat, new Size(17, 17));
 
 
-            Imgproc.threshold(analyseMat, analyseMat, 200, 255, Imgproc.THRESH_BINARY);
+//            Imgproc.threshold(analyseMat, analyseMat, 200, 255, Imgproc.THRESH_BINARY);
             var img = Utils.matToBufferedImage(analyseMat);
             LuminanceSource source = new BufferedImageLuminanceSource(img);
             var bitmap = new BinaryBitmap(new HybridBinarizer(source));
@@ -336,14 +337,14 @@ public class FxHelloCVController {
 
                 for (int i = 0; i < points.length; i++) {
                     System.out.println(points[i].getX() + ", " + points[i].getY());
-                    Imgproc.line(resultMat, new Point(points[i].getX()/8, points[i].getY()/4),
-                            new Point(points[(i + 1) % nrOfPoints].getX()/8, points[(i + 1) % nrOfPoints].getY()/4), new Scalar(255, 0, 0), 3);
+                    Imgproc.line(resultMat, new Point(points[i].getX()/8, points[i].getY()),
+                            new Point(points[(i + 1) % nrOfPoints].getX()/8, points[(i + 1) % nrOfPoints].getY()), new Scalar(255, 0, 0), 3);
                 }
 //            System.out.println(result.getResultMetadata().get(ResultMetadataType.OTHER));
                 System.out.println("Bar code result: " + result.getBarcodeFormat().name() + ", " + result.getText());
             }
 
-            return analyseMat;
+            return resultMat;
 
         } catch (NotFoundException e) {
             System.out.println("No bar code found");
