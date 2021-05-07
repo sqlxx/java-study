@@ -18,7 +18,7 @@ public class Utils {
         }
     }
 
-    private static BufferedImage matToBufferedImage(Mat frame) {
+    public static BufferedImage matToBufferedImage(Mat frame) {
         BufferedImage image = null;
 
         int width = frame.width(), height = frame.height(), channels = frame.channels();

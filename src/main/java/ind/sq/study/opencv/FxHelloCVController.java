@@ -1,5 +1,13 @@
 package ind.sq.study.opencv;
 
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.multi.GenericMultipleBarcodeReader;
+import com.google.zxing.multi.MultipleBarcodeReader;
+import com.google.zxing.oned.MultiFormatOneDReader;
+import com.google.zxing.oned.OneDReader;
+import com.google.zxing.pdf417.detector.Detector;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,9 +25,9 @@ import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.wechat_qrcode.WeChatQRCode;
 
+import javax.imageio.ImageIO;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +53,8 @@ public class FxHelloCVController {
     private CheckBox inverse;
     @FXML
     private CheckBox absRemoval;
+    @FXML
+    private CheckBox barCodeDetect;
     @FXML
     private Button refreshImgButton;
     @FXML
@@ -281,11 +291,64 @@ public class FxHelloCVController {
             } else {
                 frame = this.doBackgroundRemoval(oriFrame);
             }
-        } else if (this.qrCodeDetect.isSelected()) {
+        } else {
+
+            if (this.qrCodeDetect.isSelected()) {
 //            frame = this.detectQrCode(oriFrame);
-            frame = this.wechatQrDetector(oriFrame);
+                frame = this.wechatQrDetector(oriFrame);
+            }
+
+            if (this.barCodeDetect.isSelected()) {
+                frame = this.detectBarCode(frame);
+            }
         }
         return frame;
+    }
+
+    private Mat detectBarCode(Mat oriFrame) {
+        var hints = new HashMap<DecodeHintType, Object>();
+        hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.UPC_A, BarcodeFormat.UPC_E,
+                BarcodeFormat.CODE_39, BarcodeFormat.CODE_93, BarcodeFormat.CODABAR, BarcodeFormat.CODE_128,
+                BarcodeFormat.EAN_8, BarcodeFormat.EAN_13, BarcodeFormat.ITF, BarcodeFormat.RSS_14, BarcodeFormat.RSS_EXPANDED));
+//        hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+
+        var barCodeReader = new GenericMultipleBarcodeReader(new MultiFormatReader());
+        var resultMat = new Mat();
+        oriFrame.copyTo(resultMat);
+        var analyseMat = new Mat();
+        try {
+            Imgproc.cvtColor(oriFrame, analyseMat, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*8, analyseMat.height()*4), Imgproc.INTER_AREA);
+            Imgproc.blur(analyseMat, analyseMat, new Size(17, 17));
+
+
+            Imgproc.threshold(analyseMat, analyseMat, 200, 255, Imgproc.THRESH_BINARY);
+            var img = Utils.matToBufferedImage(analyseMat);
+            LuminanceSource source = new BufferedImageLuminanceSource(img);
+            var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+            System.out.println("hello here");
+            var results = barCodeReader.decodeMultiple(bitmap, hints);
+            for (var result: results) {
+                var points = result.getResultPoints();
+                var nrOfPoints = points.length;
+
+                System.out.println("points are " + points.length);
+
+                for (int i = 0; i < points.length; i++) {
+                    System.out.println(points[i].getX() + ", " + points[i].getY());
+                    Imgproc.line(resultMat, new Point(points[i].getX()/8, points[i].getY()/4),
+                            new Point(points[(i + 1) % nrOfPoints].getX()/8, points[(i + 1) % nrOfPoints].getY()/4), new Scalar(255, 0, 0), 3);
+                }
+//            System.out.println(result.getResultMetadata().get(ResultMetadataType.OTHER));
+                System.out.println("Bar code result: " + result.getBarcodeFormat().name() + ", " + result.getText());
+            }
+
+            return analyseMat;
+
+        } catch (NotFoundException e) {
+            System.out.println("No bar code found");
+            return oriFrame;
+        }
     }
 
     private Mat detectQrCode(Mat oriFrame) {
