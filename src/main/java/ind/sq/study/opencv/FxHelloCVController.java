@@ -40,6 +40,10 @@ public class FxHelloCVController {
     @FXML
     private ImageView currentFrame;
     @FXML
+    private ImageView tempFrame1;
+    @FXML
+    private ImageView tempFrame2;
+    @FXML
     private CheckBox haarClassifier;
     @FXML
     private CheckBox lbpClassifier;
@@ -83,6 +87,12 @@ public class FxHelloCVController {
         currentFrame.setFitWidth(1280);
         currentFrame.setFitHeight(720);
         currentFrame.setPreserveRatio(true);
+        tempFrame1.setFitHeight(360);
+        tempFrame1.setFitWidth(500);
+        tempFrame1.setPreserveRatio(true);
+        tempFrame2.setFitHeight(360);
+        tempFrame2.setFitWidth(500);
+        tempFrame2.setPreserveRatio(true);
         imgSelected = false;
 
         currentFrame.setOnMouseClicked(e -> {
@@ -305,6 +315,13 @@ public class FxHelloCVController {
         return frame;
     }
 
+    private void updateViewInTempFrame1(Mat img) {
+        updateImageView(tempFrame1, Utils.mat2Image(img));
+    }
+    private void updateViewInTempFrame2(Mat img) {
+        updateImageView(tempFrame2, Utils.mat2Image(img));
+    }
+
     private Mat detectBarCode(Mat oriFrame) {
         var hints = new HashMap<DecodeHintType, Object>();
         hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.UPC_A, BarcodeFormat.UPC_E,
@@ -319,11 +336,12 @@ public class FxHelloCVController {
         var analyseMat = new Mat();
         try {
             Imgproc.cvtColor(oriFrame, analyseMat, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*8, analyseMat.height()), Imgproc.INTER_AREA);
-            Imgproc.blur(analyseMat, analyseMat, new Size(17, 17));
+            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*4, analyseMat.height()), Imgproc.INTER_AREA);
+            Imgproc.GaussianBlur(analyseMat, analyseMat, new Size(17, 17), 5);
+            updateViewInTempFrame1(analyseMat);
 
-
-//            Imgproc.threshold(analyseMat, analyseMat, 200, 255, Imgproc.THRESH_BINARY);
+            Imgproc.threshold(analyseMat, analyseMat, 0, 255, Imgproc.THRESH_OTSU | Imgproc.THRESH_BINARY);
+            updateViewInTempFrame2(analyseMat);
             var img = Utils.matToBufferedImage(analyseMat);
             LuminanceSource source = new BufferedImageLuminanceSource(img);
             var bitmap = new BinaryBitmap(new HybridBinarizer(source));
@@ -337,8 +355,8 @@ public class FxHelloCVController {
 
                 for (int i = 0; i < points.length; i++) {
                     System.out.println(points[i].getX() + ", " + points[i].getY());
-                    Imgproc.line(resultMat, new Point(points[i].getX()/8, points[i].getY()),
-                            new Point(points[(i + 1) % nrOfPoints].getX()/8, points[(i + 1) % nrOfPoints].getY()), new Scalar(255, 0, 0), 3);
+                    Imgproc.line(resultMat, new Point(points[i].getX()/4, points[i].getY()),
+                            new Point(points[(i + 1) % nrOfPoints].getX()/4, points[(i + 1) % nrOfPoints].getY()), new Scalar(255, 0, 0), 3);
                 }
 //            System.out.println(result.getResultMetadata().get(ResultMetadataType.OTHER));
                 System.out.println("Bar code result: " + result.getBarcodeFormat().name() + ", " + result.getText());
@@ -351,6 +369,8 @@ public class FxHelloCVController {
             return oriFrame;
         }
     }
+
+
 
     private Mat detectQrCode(Mat oriFrame) {
         var detector = new QRCodeDetector();

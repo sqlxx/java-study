@@ -46,12 +46,21 @@
         </HBox>
     </bottom>
     <center>
+        <HBox alignment="CENTER">
         <VBox alignment="CENTER">
             <padding>
                 <Insets right="10" left="10" />
             </padding>
             <ImageView fx:id="currentFrame" />
         </VBox>
+            <VBox alignment="CENTER">
+                <padding>
+                    <Insets right="10" left="10" />
+                </padding>
+                <ImageView fx:id="tempFrame1" />
+                <ImageView fx:id="tempFrame2" />
+            </VBox>
+        </HBox>
     </center>
 
 </BorderPane>
