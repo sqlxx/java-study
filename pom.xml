@@ -22,6 +22,8 @@
     <maven.compiler.target>11</maven.compiler.target>
     <resilience4j.version>0.16.0</resilience4j.version>
     <protoc.version>3.7.1</protoc.version>
+    <os.detected.classifier>osx-x86_64</os.detected.classifier>
+
     <grpc.version>1.23.0</grpc.version>
   </properties>
   <dependencyManagement>

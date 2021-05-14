@@ -4,10 +4,6 @@ import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.multi.GenericMultipleBarcodeReader;
-import com.google.zxing.multi.MultipleBarcodeReader;
-import com.google.zxing.oned.MultiFormatOneDReader;
-import com.google.zxing.oned.OneDReader;
-import com.google.zxing.pdf417.detector.Detector;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,9 +21,11 @@ import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.wechat_qrcode.WeChatQRCode;
 
-import javax.imageio.ImageIO;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -336,7 +334,7 @@ public class FxHelloCVController {
         var analyseMat = new Mat();
         try {
             Imgproc.cvtColor(oriFrame, analyseMat, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*4, analyseMat.height()), Imgproc.INTER_AREA);
+            Imgproc.resize(analyseMat, analyseMat, new Size(analyseMat.width()*8, analyseMat.height()), Imgproc.INTER_AREA);
             Imgproc.GaussianBlur(analyseMat, analyseMat, new Size(17, 17), 5);
             updateViewInTempFrame1(analyseMat);
 
@@ -355,7 +353,7 @@ public class FxHelloCVController {
 
                 for (int i = 0; i < points.length; i++) {
                     System.out.println(points[i].getX() + ", " + points[i].getY());
-                    Imgproc.line(resultMat, new Point(points[i].getX()/4, points[i].getY()),
+                    Imgproc.line(resultMat, new Point(points[i].getX()/8, points[i].getY()),
                             new Point(points[(i + 1) % nrOfPoints].getX()/4, points[(i + 1) % nrOfPoints].getY()), new Scalar(255, 0, 0), 3);
                 }
 //            System.out.println(result.getResultMetadata().get(ResultMetadataType.OTHER));
@@ -407,8 +405,8 @@ public class FxHelloCVController {
 
     private Mat wechatQrDetector(Mat oriFrame) {
 
-        var detector = new WeChatQRCode("/Users/sqlxx/Downloads/detect.prototxt", "/Users/sqlxx/Downloads/detect.caffemodel",
-                "/Users/sqlxx/Downloads/sr.prototxt", "/Users/sqlxx/Downloads/sr.caffemodel");
+        var detector = new WeChatQRCode("target/classes/detect.prototxt", "target/classes/detect.caffemodel",
+                "target/classes/sr.prototxt", "target/classes/sr.caffemodel");
 //        var detector = new WeChatQRCode("/Users/sqlxx/Downloads/detect.prototxt", "/Users/sqlxx/Downloads/detect.caffemodel");
         var result = new Mat();
         var pointsOfRect = new ArrayList<Mat>();
