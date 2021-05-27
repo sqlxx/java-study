@@ -7,9 +7,12 @@
 　　　　　 </encoder> 
 　　　</appender> 
 
-　　　<root level="DEBUG"> 
+　　　<root level="INFO">
 　　　　　　<appender-ref ref="STDOUT" /> 
 　　　</root> 
     <logger name="io.netty" level="info"/>
     <logger name="io.grpc" level="info"/>
+    <logger name="sun" level="info"/>
+    <logger name="javax.management" level="info"/>
+    <logger name="org.springframework" level="info"/>
 </configuration>
