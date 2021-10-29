@@ -2,10 +2,12 @@ package ind.sq.study.grpc;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class GreeterServer {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
@@ -14,7 +16,8 @@ public class GreeterServer {
     private Server server;
 
     public void start() throws IOException {
-        this.server = ServerBuilder.forPort(PORT).addService(new GreeterImpl()).build().start();
+        this.server = NettyServerBuilder.forPort(PORT).maxConnectionAge(1000, TimeUnit.SECONDS).addService(new GreeterImpl()).build();
+        this.server.start();
         logger.info("Server started on port {}", PORT);
     }
 
@@ -23,6 +26,7 @@ public class GreeterServer {
             server.shutdown();
             logger.info("Server stopped");
         }
+
     }
 
     public void blockUntilShutdown() throws InterruptedException {

@@ -26,23 +26,33 @@ public class Client extends Thread {
 
     @Override
     public void run() {
-        String name = Thread.currentThread().getName();
+//        String name = Thread.currentThread().getName();
 //        HelloReply reply = greeterStub.sayHello(HelloRequest.newBuilder().setFirstName(name).build());
         HelloReply reply = greeterStub.sayHello(HelloRequest.newBuilder().build());
 
-        logger.info("{}/{}/{}", reply.getMessage(), reply.getAge(), reply.getMemo() == "");
+        logger.info("<<< {}/{}/{}", reply.getMessage(), reply.getAge(), reply.getMemo().equals(""));
 
     }
     
     public static void main(String[] args) {
 
         logger.info("Starting client");
-        var channelBuilder = ManagedChannelBuilder.forAddress("localhost", 9900).usePlaintext();
+        var channelBuilder = ManagedChannelBuilder.forAddress("localhost", 50051).enableRetry().usePlaintext();
+        var client = new Client(GreeterGrpc.newBlockingStub(channelBuilder.build()));
+        for (int i = 0; i < 200000; i ++) {
+//            try {
+//                sleep(1000l);
+//            } catch (InterruptedException e) {
+//
+//            }
+            logger.info(">>>Staring Run {} times", i);
+            client.run();
+        }
 
-        var blockingStub = HealthGrpc.newBlockingStub(channelBuilder.build());
-            // GreeterGrpc.newBlockingStub(channelBuilder.build());
-        var response = blockingStub.check(Healthcheck.HealthCheckRequest.newBuilder().build());
-        System.out.println(response.getStatus());
+//        var blockingStub = HealthGrpc.newBlockingStub(channelBuilder.build());
+//            // GreeterGrpc.newBlockingStub(channelBuilder.build());
+//        var response = blockingStub.check(Healthcheck.HealthCheckRequest.newBuilder().build());
+//        System.out.println(response.getStatus());
 //        var es = Executors.newFixedThreadPool(100);
 //        for (int i = 0; i < 100; i++) {
 //            es.submit(new Client(blockingStub));

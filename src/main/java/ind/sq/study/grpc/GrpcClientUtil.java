@@ -114,6 +114,7 @@ public class GrpcClientUtil {
 
 //        var channelBuilder = ManagedChannelBuilder.forTarget("dns:///" + serviceName.toLowerCase());
         var channelBuilder = ManagedChannelBuilder.forAddress("localhost", 9900).usePlaintext();
+        channelBuilder.maxRetryAttempts(3).enableRetry();
         var channel = channelBuilder.build();
 
         channelMap.put(serviceName, channel);

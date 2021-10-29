@@ -20,11 +20,11 @@ public class GreeterImpl extends GreeterImplBase {
 
         var reply = HelloReply.newBuilder().setMessage("Hello " + name).build();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            //ignored
-        }
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            //ignored
+//        }
 
         responseObserver.onNext(reply);
         logger.info("Response replied");

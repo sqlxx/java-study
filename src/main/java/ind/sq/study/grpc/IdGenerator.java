@@ -4,6 +4,7 @@ import com.maycur.grpc.idgeneration.IdGeneration;
 import com.maycur.grpc.idgeneration.IdGenerationServiceGrpc;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.AbstractStub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+
+import static com.maycur.common.exception.BasicErrorCode.GRPC_ERROR_CODE;
 
 /**
  * Created by sqlxx on 2019-09-18.
@@ -26,7 +29,7 @@ public class IdGenerator {
         this.stub = stub;
     }
 
-    public String genId() {
+    public long genId() {
         var id = stub.getUniqueId(IdGeneration.IdRequest.getDefaultInstance());
         return id.getId();
     }
@@ -55,10 +58,20 @@ public class IdGenerator {
 //            var result = stub.getUniqueId(IdGeneration.IdRequest.getDefaultInstance());
 //            logger.info("got ID: {}", result.getId());
 //        }
+        var request = IdGeneration.BatchUniqueIdRequest.newBuilder().setCount(600).build();
+        try {
+            var response = stub.getBatchUniqueIds(request);
+            List<Long> ids = response.getIdsList();
+            for (Long id : ids) {
+                logger.info("" + id);
+            }
+            logger.info("Total id count is {}", ids.size());
+        } catch (StatusRuntimeException ex) {
+            logger.error("Status Code: {}, error message: {}, (code)error message: {}, actual errorCode: {}", ex.getStatus().getCode(),
+                    ex.getStatus().getDescription(), ex.getMessage(), ex.getTrailers().get(GRPC_ERROR_CODE));
+            ;
 
-        var response = stub.getBatchUniqueIds(IdGeneration.BatchUniqueIdRequest.getDefaultInstance());
-        List<String> ids = response.getIdsList();
-
+        }
 
 //        Class<? extends AbstractStub> stubClass = IdGenerationServiceGrpc.IdGenerationServiceStub.class;
 //        logger.info("{}", stubClass.getTypeName());

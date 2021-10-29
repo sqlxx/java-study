@@ -2,9 +2,6 @@ package ind.sq.study.multiplecontext;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletPath;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +32,6 @@ public class MultipleContextApp {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
         ctx.setParent(parent);
         ctx.register(configClass);
-        ctx.refresh();
         dispatcherServlet.setApplicationContext(ctx);
 
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(dispatcherServlet, path);
