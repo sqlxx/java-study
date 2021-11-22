@@ -2,9 +2,12 @@ package ind.sq.study.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class SocketTest {
 
@@ -69,17 +72,31 @@ public class SocketTest {
             while(true) {
                 try {
                     var ops = selector.select(1000);
-                    System.out.println(ops + " ops selected");
+//                    System.out.println(ops + " ops selected");
 //                    if (ops == 0) {
 //                        System.out.println("Continue");
 //                        continue;
 //                    }
                     var keys = selector.selectedKeys();
-                    for (var key: keys) {
+                    var iter = keys.iterator();
+                    var buffer = ByteBuffer.allocate(128);
+                    while(iter.hasNext()) {
+                        var key = iter.next();
+                        iter.remove();
                         if (key.isReadable()) {
                             System.out.println(key.channel() + " is ready for read " + key);
+                            buffer.clear();
+                            var readBytes = ((SocketChannel)key.channel()).read(buffer);
+                            System.out.println(readBytes + " bytes read from channel");
+
+                            buffer.flip();
+                            while(buffer.hasRemaining()) {
+                                System.out.print( (char)buffer.get());
+                            }
+                            System.out.println();
+
                         } else if (key.isWritable()) {
-                            System.out.println(key.channel() + " is ready for write " + key);
+//                            System.out.println(key.channel() + " is ready for write " + key);
 
                         } else {
                             System.out.println("Unknown key: " + key);
