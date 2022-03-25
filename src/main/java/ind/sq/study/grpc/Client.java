@@ -1,18 +1,11 @@
 package ind.sq.study.grpc;
 
-import com.maycur.common.grpc.HealthChecker;
-import grpc.health.v1.HealthGrpc;
-import grpc.health.v1.Healthcheck;
 import ind.sq.study.grpc.GreeterGrpc.GreeterBlockingStub;
 import ind.sq.study.grpc.Helloworld.HelloReply;
 import ind.sq.study.grpc.Helloworld.HelloRequest;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.stub.MetadataUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Executors;
 
 public class Client extends Thread {
 

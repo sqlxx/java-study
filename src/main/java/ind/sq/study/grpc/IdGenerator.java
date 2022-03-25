@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
-import static com.maycur.common.exception.BasicErrorCode.GRPC_ERROR_CODE;
-
 /**
  * Created by sqlxx on 2019-09-18.
  * Copyright to Maycur Tech.
@@ -67,8 +65,8 @@ public class IdGenerator {
             }
             logger.info("Total id count is {}", ids.size());
         } catch (StatusRuntimeException ex) {
-            logger.error("Status Code: {}, error message: {}, (code)error message: {}, actual errorCode: {}", ex.getStatus().getCode(),
-                    ex.getStatus().getDescription(), ex.getMessage(), ex.getTrailers().get(GRPC_ERROR_CODE));
+            logger.error("Status Code: {}, error message: {}, (code)error message: {}", ex.getStatus().getCode(),
+                    ex.getStatus().getDescription(), ex.getMessage());
             ;
 
         }

@@ -1,6 +1,5 @@
 package ind.sq.study.pdf;
 
-import com.maycur.common.exception.InvalidParameterException;
 import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -10,6 +9,7 @@ import org.apache.pdfbox.text.TextPosition;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
