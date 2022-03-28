@@ -1,5 +1,6 @@
 package ind.sq.study.springboot.controller;
 
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +52,9 @@ public class HelloController {
     @GetMapping("/hello")
     public String hello() {
         try {
-            var bean = context.getBean("SimpleBean");
+
+//            return StringUtils.join(context.getBeanDefinitionNames());
+            var bean = context.getBean("ind.sq.test.SimpleBean");
             return "Simple bean load successfully";
         } catch (NoSuchBeanDefinitionException ex) {
             return ex.getMessage();
