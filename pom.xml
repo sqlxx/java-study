@@ -192,6 +192,26 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-commons</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.maycur</groupId>
+      <artifactId>grpc-proxy-common</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.maycur</groupId>
+      <artifactId>grpc-proxy-server</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.maycur</groupId>
+      <artifactId>grpc-proxy-client</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.caucho</groupId>
+      <artifactId>hessian</artifactId>
+      <version>4.0.65</version>
+    </dependency>
 
   </dependencies>
 
