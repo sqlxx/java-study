@@ -4,10 +4,11 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.*;
 import java.util.Properties;
 
 public class Mail {
-    public static void main(String[] args) throws MessagingException {
+    public static void main(String[] args) throws MessagingException, FileNotFoundException {
         Properties properties = new Properties();
         properties.setProperty("mail.smtp.host", "smtp.mxhichina.com");
         properties.setProperty("mail.smtp.auth", "true");

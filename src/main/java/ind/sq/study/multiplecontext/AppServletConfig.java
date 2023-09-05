@@ -22,8 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 @EnableWebMvc
 public class AppServletConfig {
 
-//    private static final Logger logger = LoggerFactory.getLogger(AppServletConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppServletConfig.class);
 //
+
 //    public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(new HandlerInterceptor() {
 //            @Override
@@ -33,6 +34,7 @@ public class AppServletConfig {
 //            }
 //        });
 //    }
+
 
 //    @Bean
 //    public RequestMappingHandlerMapping requestMappingHandlerMapping() {

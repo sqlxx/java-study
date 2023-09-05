@@ -212,6 +212,11 @@
       <artifactId>hessian</artifactId>
       <version>4.0.65</version>
     </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-ai-openai</artifactId>
+      <version>1.0.0-beta.3</version>
+    </dependency>
 
   </dependencies>
 
