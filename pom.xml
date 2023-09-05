@@ -24,7 +24,7 @@
     <protoc.version>3.7.1</protoc.version>
     <os.detected.classifier>osx-x86_64</os.detected.classifier>
 
-    <grpc.version>1.23.0</grpc.version>
+    <grpc.version>1.53.0</grpc.version>
   </properties>
   <dependencyManagement>
     <dependencies>
