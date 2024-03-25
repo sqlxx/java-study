@@ -1,6 +1,7 @@
 package ind.sq.study.pdf;
 
 import org.apache.fontbox.util.BoundingBox;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class TestMain {
     public static void main(String[] args) throws IOException {
 
-        try (var doc = PDDocument.load(new File("/Users/sqlxx/Downloads/pf.pdf"))) {
+        try (var doc = Loader.loadPDF(new File("/Users/sqlxx/Downloads/pf.pdf"))) {
             Splitter splitter = new Splitter();
             var docs = splitter.split(doc);
             System.out.println("Splitted to " + docs.size());
