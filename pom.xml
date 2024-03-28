@@ -123,9 +123,9 @@
       <version>8.0.21</version>
     </dependency>
     <dependency>
-      <groupId>org.opencv</groupId>
+      <groupId>org.bytedeco</groupId>
       <artifactId>opencv</artifactId>
-      <version>4.5.2</version>
+      <version>4.9.0-1.5.10</version>
     </dependency>
 <!--    <dependency>-->
 <!--      <groupId>com.maycur</groupId>-->
@@ -192,26 +192,26 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-commons</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.maycur</groupId>
-      <artifactId>grpc-proxy-common</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.maycur</groupId>
-      <artifactId>grpc-proxy-server</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.maycur</groupId>
-      <artifactId>grpc-proxy-client</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.caucho</groupId>
-      <artifactId>hessian</artifactId>
-      <version>4.0.65</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.maycur</groupId>-->
+<!--      <artifactId>grpc-proxy-common</artifactId>-->
+<!--      <version>1.0.3-SNAPSHOT</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.maycur</groupId>-->
+<!--      <artifactId>grpc-proxy-server</artifactId>-->
+<!--      <version>1.0.3-SNAPSHOT</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.maycur</groupId>-->
+<!--      <artifactId>grpc-proxy-client</artifactId>-->
+<!--      <version>1.0.3-SNAPSHOT</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.caucho</groupId>-->
+<!--      <artifactId>hessian</artifactId>-->
+<!--      <version>4.0.65</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-ai-openai</artifactId>
@@ -268,20 +268,6 @@
       </extension>
     </extensions>
     <plugins>
-
-      <plugin>
-        <groupId>com.maycur.maven</groupId>
-        <artifactId>ice-maven-plugin</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
 
         <plugin>
           <groupId>org.xolstice.maven.plugins</groupId>
