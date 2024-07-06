@@ -2,7 +2,6 @@ package ind.sq.study.pdf;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
-import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import javax.imageio.ImageIO;
@@ -34,9 +33,9 @@ public class Pdf2ImgConverter {
     public static void main(String[] args) throws IOException {
        var converter = new Pdf2ImgConverter();
        var classloader = Thread.currentThread().getContextClassLoader();
-       try (var pdfStream = classloader.getResourceAsStream("永辉.pdf")) {
+       try (var pdfStream = classloader.getResourceAsStream("田英飞翔稻壳合同-6.20（单章）.pdf")) {
            long start = System.currentTimeMillis();
-           var imgs = converter.convertToImg(pdfStream, "/Users/sqlxx/Downloads/ocr/永辉", "png");
+           var imgs = converter.convertToImg(pdfStream, "/Users/sqlxx/Downloads/ocr/田英飞翔稻壳合同-6.20（单章）", "png");
            System.out.println("Cost " + (System.currentTimeMillis() - start) + "ms");
        }
 
