@@ -36,7 +36,7 @@ public class GptTest {
 
         var watch = new StopWatch();
         var option = new ChatCompletionsOptions(chatMessages);
-        var functionDef = new FunctionDefinition("getWeather").setDescription("获取指定城市的实况天气或者天气预报");
+        var functionDef = new ChatCompletionsFunctionToolDefinitionFunction("getWeather").setDescription("获取指定城市的实况天气或者天气预报");
         functionDef.setParameters(getTemperatureParameters());
         var toolDefinition = new ChatCompletionsFunctionToolDefinition(functionDef);
 

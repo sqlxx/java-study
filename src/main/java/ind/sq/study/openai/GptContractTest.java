@@ -11,7 +11,6 @@ import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GptContractTest {
@@ -22,7 +21,6 @@ public class GptContractTest {
         String endpoint = System.getenv("OPENAI_API_BASE");
 
         String gptModelId = System.getenv("MODEL_NAME");
-        String embeddingModelId = "embedding";
         System.out.println(endpoint);
         System.out.println(azureOpenaiKey);
 
@@ -73,7 +71,6 @@ public class GptContractTest {
         watch.start();
         System.out.println("Start calling LLM");
         option.setTemperature(0.2);
-        option.setStream(true);
         var stream = client.getChatCompletionsStream(gptModelId, option);
         final Map<String, Integer> usageMap = new HashMap<>();
         usageMap.put("PROMPT", 0);
