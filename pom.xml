@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.5.6</version>
+    <version>3.3.2</version>
   </parent>
 
   <name>java-study</name>
@@ -23,20 +23,10 @@
     <resilience4j.version>0.16.0</resilience4j.version>
     <protoc.version>3.7.1</protoc.version>
     <os.detected.classifier>osx-x86_64</os.detected.classifier>
-
+    <slf4j.version>2.0.15</slf4j.version>
     <grpc.version>1.23.0</grpc.version>
+    <logback.version>1.5.6</logback.version>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-dependencies</artifactId>
-        <version>2022.0.5</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -55,6 +45,26 @@
       <version>${resilience4j.version}</version>   
     </dependency>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-bulkhead</artifactId>
       <version>${resilience4j.version}</version>   
@@ -63,11 +73,6 @@
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-timelimiter</artifactId>
       <version>${resilience4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.5.3</version>
     </dependency>
     <dependency>
       <groupId>io.reactivex.rxjava3</groupId>
@@ -182,10 +187,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-commons</artifactId>
+      <version>3.3.2</version>
     </dependency>
 <!--    <dependency>-->
 <!--      <groupId>com.maycur</groupId>-->
@@ -222,9 +224,18 @@
       <artifactId>opennlp-tools</artifactId>
       <version>2.3.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.wechaty</groupId>
+      <artifactId>wechaty</artifactId>
+      <version>0.1.5-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-slf4j-impl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
-
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
