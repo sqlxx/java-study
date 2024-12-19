@@ -227,7 +227,11 @@ Temporary Items
 
 *.log
 test
+<<<<<<< HEAD
 
 *.pdf
 *.bin
 
+=======
+*.docx
+>>>>>>> 70dbe662693532fbc1baaaf6c4bd571cbc59ba3b
